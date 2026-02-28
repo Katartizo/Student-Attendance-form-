@@ -4,7 +4,7 @@
 // ===================================
 const CLASS_LAT = 7.800461; 
 const CLASS_LON = 3.913026;
-const ALLOWED_RADIUS = 50000; 
+const ALLOWED_RADIUS = 500000; 
 
 const statusEl = document.getElementById('status-message');
 const formContainer = document.getElementById('google-form-container');
