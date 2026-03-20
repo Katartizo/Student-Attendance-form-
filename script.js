@@ -94,3 +94,59 @@ form.addEventListener('submit', e => {
       submitBtn.disabled = false;
     });
 });
+
+
+
+// The URL you get from Google Apps Script after deploying
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwEHvfN2TsHwuDrvYihdRtQjkcHJ2Dx0hNtOfpMYQ0u8Y0YHS0EWevHyFpw9mg1XaV0vQ/exec"; 
+
+// This function gets called ONLY if the GPS check passes
+function sendDataToGoogleSheets() {
+    // 1. Grab the values the student typed into your HTML form
+    const studentMatric = document.getElementById("matricInput").value;
+    const studentName = document.getElementById("nameInput").value;
+
+    // 2. Basic check to make sure they didn't submit an empty form
+    if (!studentMatric || !studentName) {
+        alert("Please fill in both your Name and Matric Number!");
+        return;
+    }
+
+    // 3. Package the data nicely into a JSON object
+    const payload = {
+        matric: studentMatric,
+        name: studentName
+    };
+
+    // 4. Change the button text so the student knows it's loading
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.innerText = "Submitting...";
+    submitBtn.disabled = true;
+
+    // 5. Fire the data to your Google Sheet API
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        // 'no-cors' is crucial here to prevent Google from blocking the request
+        mode: "no-cors", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        // Since 'no-cors' hides the exact response, we assume success if no network error
+        alert("Attendance marked successfully! ✓");
+        
+        // Reset the form and button
+        document.getElementById("matricInput").value = "";
+        document.getElementById("nameInput").value = "";
+        submitBtn.innerText = "Mark Attendance";
+        submitBtn.disabled = false;
+    })
+    .catch((error) => {
+        alert("Network error. Please try again.");
+        console.error("Error:", error);
+        submitBtn.innerText = "Mark Attendance";
+        submitBtn.disabled = false;
+    });
+}
