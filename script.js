@@ -98,7 +98,7 @@ form.addEventListener('submit', e => {
 
 
 // The URL you get from Google Apps Script after deploying
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwEHvfN2TsHwuDrvYihdRtQjkcHJ2Dx0hNtOfpMYQ0u8Y0YHS0EWevHyFpw9mg1XaV0vQ/exec"; 
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxS7Cu4QM1__DivX1ftX1nNRoc7ijHVP-vzOSbPAK94MaaEqSPJzTAoSVUpvlaDJiDXvA/exec"
 
 // This function gets called ONLY if the GPS check passes
 function sendDataToGoogleSheets() {
