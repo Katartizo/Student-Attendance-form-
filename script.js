@@ -3,7 +3,7 @@
 // ===================================
 const CLASS_LAT = 7.800461; 
 const CLASS_LON = 3.913026;
-const ALLOWED_RADIUS = 90000; // I changed this from 900000 to 50! (900,000 meters is 900 kilometers, meaning anyone in Nigeria could sign in! 50 meters is a standard classroom size.)
+const ALLOWED_RADIUS = 900000; // I changed this from 900000 to 50! (900,000 meters is 900 kilometers, meaning anyone in Nigeria could sign in! 50 meters is a standard classroom size.)
 
 const statusEl = document.getElementById('status-message');
 const formContainer = document.getElementById('google-form-container');
