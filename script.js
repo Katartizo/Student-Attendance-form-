@@ -3,13 +3,14 @@
 // ===================================
 const CLASS_LAT = 7.800461; 
 const CLASS_LON = 3.913026;
-const ALLOWED_RADIUS = 900000; // I changed this from 900000 to 50! (900,000 meters is 900 kilometers, meaning anyone in Nigeria could sign in! 50 meters is a standard classroom size.)
+// Radius is set to 50 meters so students must be inside or right next to the hall
+const ALLOWED_RADIUS = 50; 
 
 const statusEl = document.getElementById('status-message');
 const formContainer = document.getElementById('google-form-container');
 
 // ===================================
-// 2. GPS LOGIC
+// 2. GPS VERIFICATION LOGIC
 // ===================================
 function checkLocation() {
     statusEl.className = 'loading';
@@ -34,10 +35,10 @@ function success(position) {
 
     if (distance <= ALLOWED_RADIUS) {
         showSuccess(`Success! You are in class (${Math.round(distance)}m away).`);
-        formContainer.style.display = "block"; 
+        formContainer.style.display = "block"; // Shows the form
     } else {
         showError(`Access Denied. You are ${Math.round(distance)}m away. You must be within ${ALLOWED_RADIUS}m.`);
-        formContainer.style.display = "none";
+        formContainer.style.display = "none"; // Keeps the form hidden
     }
 }
 
@@ -52,7 +53,7 @@ function error(err) {
 function showSuccess(msg) { statusEl.className = 'success'; statusEl.innerText = msg; }
 function showError(msg) { statusEl.className = 'error'; statusEl.innerText = msg; }
 
-// Haversine Formula for Distance
+// Haversine Formula for exact distance on Earth's curve
 function getDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3; 
     const dLat = deg2rad(lat2 - lat1);
@@ -63,57 +64,56 @@ function getDistance(lat1, lon1, lat2, lon2) {
 }
 function deg2rad(deg) { return deg * (Math.PI/180); }
 
-
-
-===================================
-// 3. GOOGLE SHEETS SUBMIT LOGIC (FIXED)
+// ===================================
+// 3. GOOGLE SHEETS SUBMISSION LOGIC
 // ===================================
 const form = document.getElementById('attendance-form');
 const submitBtn = document.getElementById('submit-btn');
 
-// Your actual active Google Apps Script API Link
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBKbxEMr8KaR8aAWVLwD42qccNtufFAttaJMA5psa9EB0l0U41yCpb58sj3QwBwxFjsg/exec";
+// Your active Google Apps Script API Link
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxS7Cu4QM1__DivX1ftX1nNRoc7ijHVP-vzOSbPAK94MaaEqSPJzTAoSVUpvlaDJiDXvA/exec";
 
 form.addEventListener('submit', e => {
-    e.preventDefault(); // Stops the page from refreshing
+    e.preventDefault(); // Stops the page from refreshing immediately
     
-    // 1. Grab values using the EXACT IDs from your HTML
+    // 1. Grab all values using the exact IDs from your HTML
     const firstName = document.getElementById("first-name").value;
     const lastName = document.getElementById("last-name").value;
     const studentMatric = document.getElementById("matric-number").value;
+    const studentEmail = document.getElementById("email").value;
+    const studentLevel = document.getElementById("referrer").value;
+    const classCode = document.getElementById("bio").value; 
     
-    // 2. Combine first and last name so the Google Sheet gets one full name
-    const studentName = firstName + " " + lastName;
-
-    // 3. Package the data exactly how your Apps Script expects it
+    // 2. Package all the data perfectly for Google Sheets
     const payload = {
         matric: studentMatric,
-        name: studentName
+        name: firstName + " " + lastName, // Combines names smoothly
+        email: studentEmail,
+        level: studentLevel,
+        classNumber: classCode
     };
 
-    // 4. Update the button to show it's loading
+    // 3. Update the button to show it is processing
     submitBtn.value = "Submitting...";
     submitBtn.disabled = true;
 
-    // 5. Fire the JSON data to Google Sheets
+    // 4. Fire the JSON data to Google Sheets
     fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors", // Crucial so Google doesn't block the request
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     })
     .then(() => {
         alert("Attendance Submitted Successfully! ✓");
-        form.reset(); // Clears the inputs
+        form.reset(); // Clears the inputs for the next person
         submitBtn.value = "Submit Attendance";
         submitBtn.disabled = false;
         formContainer.style.display = "none"; // Hides the form again
-        statusEl.innerText = "Attendance recorded!";
+        statusEl.innerText = "Attendance recorded! Thank you.";
     })
     .catch(error => {
-        console.error('Error!', error);
+        console.error('Network Error:', error);
         alert("Network error. Please try again.");
         submitBtn.value = "Submit Attendance";
         submitBtn.disabled = false;
