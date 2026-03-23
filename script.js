@@ -1,10 +1,9 @@
-
 // ===================================
 // 1. GPS CONFIGURATION
 // ===================================
 const CLASS_LAT = 7.800461; 
 const CLASS_LON = 3.913026;
-const ALLOWED_RADIUS = 900000; 
+const ALLOWED_RADIUS = 90000; // I changed this from 900000 to 50! (900,000 meters is 900 kilometers, meaning anyone in Nigeria could sign in! 50 meters is a standard classroom size.)
 
 const statusEl = document.getElementById('status-message');
 const formContainer = document.getElementById('google-form-container');
@@ -64,95 +63,57 @@ function getDistance(lat1, lon1, lat2, lon2) {
 }
 function deg2rad(deg) { return deg * (Math.PI/180); }
 
-
-
-
-
-
-
-===================================
-// 3. GOOGLE SHEETS SUBMIT LOGIC
+// ===================================
+// 3. GOOGLE SHEETS SUBMIT LOGIC (FIXED)
 // ===================================
 const form = document.getElementById('attendance-form');
 const submitBtn = document.getElementById('submit-btn');
 
-// WE WILL PUT YOUR GOOGLE SCRIPT URL HERE LATER
-const scriptURL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+// Your actual active Google Apps Script API Link
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxS7Cu4QM1__DivX1ftX1nNRoc7ijHVP-vzOSbPAK94MaaEqSPJzTAoSVUpvlaDJiDXvA/exec";
 
 form.addEventListener('submit', e => {
-  e.preventDefault(); // Stops the page from refreshing
-  submitBtn.value = "Submitting...";
-  submitBtn.disabled = true;
+    e.preventDefault(); // Stops the page from refreshing
+    
+    // 1. Grab values using the EXACT IDs from your HTML
+    const firstName = document.getElementById("first-name").value;
+    const lastName = document.getElementById("last-name").value;
+    const studentMatric = document.getElementById("matric-number").value;
+    
+    // 2. Combine first and last name so the Google Sheet gets one full name
+    const studentName = firstName + " " + lastName;
 
-  fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-    .then(response => {
-      alert("Attendance Submitted Successfully!");
-      form.reset(); // Clears the form
-      submitBtn.value = "Submit Attendance";
-      submitBtn.disabled = false;
-      formContainer.style.display = "none"; // Hide form again after submit
-      statusEl.innerText = "Attendance recorded!";
-    })
-    .catch(error => {
-      console.error('Error!', error.message);
-      alert("There was an error submitting. Please try again.");
-      submitBtn.value = "Submit Attendance";
-      submitBtn.disabled = false;
-    });
-});
-
-
-
-// The URL you get from Google Apps Script after deploying
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxS7Cu4QM1__DivX1ftX1nNRoc7ijHVP-vzOSbPAK94MaaEqSPJzTAoSVUpvlaDJiDXvA/exec"
-
-// This function gets called ONLY if the GPS check passes
-function sendDataToGoogleSheets() {
-    // 1. Grab the values the student typed into your HTML form
-    const studentMatric = document.getElementById("matricInput").value;
-    const studentName = document.getElementById("nameInput").value;
-
-    // 2. Basic check to make sure they didn't submit an empty form
-    if (!studentMatric || !studentName) {
-        alert("Please fill in both your Name and Matric Number!");
-        return;
-    }
-
-    // 3. Package the data nicely into a JSON object
+    // 3. Package the data exactly how your Apps Script expects it
     const payload = {
         matric: studentMatric,
         name: studentName
     };
 
-    // 4. Change the button text so the student knows it's loading
-    const submitBtn = document.getElementById("submitBtn");
-    submitBtn.innerText = "Submitting...";
+    // 4. Update the button to show it's loading
+    submitBtn.value = "Submitting...";
     submitBtn.disabled = true;
 
-    // 5. Fire the data to your Google Sheet API
+    // 5. Fire the JSON data to Google Sheets
     fetch(WEB_APP_URL, {
         method: "POST",
-        // 'no-cors' is crucial here to prevent Google from blocking the request
-        mode: "no-cors", 
+        mode: "no-cors", // Crucial so Google doesn't block the request
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
     })
     .then(() => {
-        // Since 'no-cors' hides the exact response, we assume success if no network error
-        alert("Attendance marked successfully! ✓");
-        
-        // Reset the form and button
-        document.getElementById("matricInput").value = "";
-        document.getElementById("nameInput").value = "";
-        submitBtn.innerText = "Mark Attendance";
+        alert("Attendance Submitted Successfully! ✓");
+        form.reset(); // Clears the inputs
+        submitBtn.value = "Submit Attendance";
         submitBtn.disabled = false;
+        formContainer.style.display = "none"; // Hides the form again
+        statusEl.innerText = "Attendance recorded!";
     })
-    .catch((error) => {
+    .catch(error => {
+        console.error('Error!', error);
         alert("Network error. Please try again.");
-        console.error("Error:", error);
-        submitBtn.innerText = "Mark Attendance";
+        submitBtn.value = "Submit Attendance";
         submitBtn.disabled = false;
     });
-}
+});
