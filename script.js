@@ -63,7 +63,9 @@ function getDistance(lat1, lon1, lat2, lon2) {
 }
 function deg2rad(deg) { return deg * (Math.PI/180); }
 
-// ===================================
+
+
+===================================
 // 3. GOOGLE SHEETS SUBMIT LOGIC (FIXED)
 // ===================================
 const form = document.getElementById('attendance-form');
