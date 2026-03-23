@@ -4,7 +4,7 @@
 const CLASS_LAT = 7.800461; 
 const CLASS_LON = 3.913026;
 // Radius is set to 50 meters so students must be inside or right next to the hall
-const ALLOWED_RADIUS = 50; 
+const ALLOWED_RADIUS = 900000; 
 
 const statusEl = document.getElementById('status-message');
 const formContainer = document.getElementById('google-form-container');
