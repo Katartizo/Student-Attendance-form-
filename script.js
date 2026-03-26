@@ -71,7 +71,7 @@ const form = document.getElementById('attendance-form');
 const submitBtn = document.getElementById('submit-btn');
 
 // Your active Google Apps Script API Link
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxdcDn7ayPo10CAJq54x41S3CFGoBKAUNlUTnEQTMsYeWES0kEFGvQnJ2uV952R2J3GWg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyTrD6DQxSTJ0J2IvAiBlHHDZ5jlxVmzgXWpETvKgsnTpBYg6W5MK-OktmzWsPTzvHK-g/exec";
 
 form.addEventListener('submit', e => {
     e.preventDefault(); // Stops the page from refreshing immediately
